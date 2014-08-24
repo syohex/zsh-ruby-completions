@@ -1,0 +1,46 @@
+#compdef ghn
+
+local -a _ghn_subcommands
+_ghn_subcommands=(
+  'list:Describe available commands or one specific command'
+  'open:List unread notifications'
+  'help:Create a new dist'
+)
+
+_arguments '*:: :->subcmd'
+
+if [[ "$state" == "subcmd" ]];then
+
+  if (( CURRENT == 1)); then
+    _describe -t commands "ghn command" _ghn_subcommands -V1
+    return
+  else
+    local opts curcontext
+    local -a repositories
+
+    case "$words[1]" in
+      list|open)
+        repositories=($(ghn list|perl -wlne 'm{^\Qhttps://github.com/\E([^/]+/[^/]+)} and print $1'))
+        opts=(
+          '(-a --all)'{-a,--all}'[List/Open all unread notifications]'
+          '(--no-all)--no-all[List/Open not all notifications]'
+        )
+        _arguments -s : "$opts[@]" '*:repository:'"($repositories)"
+        return 0
+        ;;
+      help)
+        subcommands=(list open)
+        _arguments -s : "()"'*: :'"($subcommands)"
+        return 0
+        ;;
+    esac
+  fi
+fi
+
+# Local Variables:
+# mode: Shell-Script
+# sh-indentation: 2
+# indent-tabs-mode: nil
+# sh-basic-offset: 2
+# End:
+# vim: ft=zsh sw=2 ts=2 et
