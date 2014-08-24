@@ -20,7 +20,7 @@ if [[ "$state" == "subcmd" ]];then
 
     case "$words[1]" in
       list|open)
-        repositories=($(ghn list|perl -wlne 'm{^\Qhttps://github.com/\E([^/]+/[^/]+)} and print $1'))
+        repositories=($(ghn list|perl -lne 'm{github.com/\E([^/]+/[^/]+)} and $a{$1}=1; END{ print for keys %a}'))
         opts=(
           '(-a --all)'{-a,--all}'[List/Open all unread notifications]'
           '(--no-all)--no-all[List/Open not all notifications]'
